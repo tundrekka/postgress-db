@@ -9,6 +9,8 @@ import {
    Arg,
    Ctx,
    ObjectType,
+   FieldResolver,
+   Root,
 } from 'type-graphql'
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from '../constants/constants'
 import { UsernamePasswordInput } from './UsernamePasswordInput'
@@ -34,8 +36,15 @@ class UserResponse {
    user?: User
 }
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+   @FieldResolver(() => String)
+   email(@Root() user: User, @Ctx() {req}: MyContext) {
+      if(req.session.userId === user.id) {
+         return user.email
+      }
+      return ""
+   }
 
    // change password
    @Mutation(() => UserResponse)

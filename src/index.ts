@@ -16,6 +16,7 @@ import { COOKIE_NAME, __prod__ } from './constants/constants'
 import { createConnection } from 'typeorm'
 import { Post } from './entities/Post'
 import { User } from './entities/User'
+import { Updoot } from './entities/Updoot'
 const main = async() => {
    const conn = await createConnection({
       type: 'postgres',
@@ -24,17 +25,17 @@ const main = async() => {
       password: 'gql-user',
       logging: true,
       synchronize: true,
-      entities: [Post, User],
+      entities: [Post, User, Updoot],
       migrations: [path.join(__dirname, './migrations/*')]
    })
-   await conn.runMigrations()
+   // await conn.runMigrations()
    
    const app = express()
    const RedisStore = connectRedis(session)
    const redis = new Redis()
 
 
-   // cors
+   // cor
    app.use(cors({
       origin: 'http://localhost:3000',
       credentials: true
