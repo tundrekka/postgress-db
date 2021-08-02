@@ -17,8 +17,10 @@ import { createConnection } from 'typeorm'
 import { Post } from './entities/Post'
 import { User } from './entities/User'
 import { Updoot } from './entities/Updoot'
+import { createUserLoader } from './utils/createUserLoader'
+
 const main = async() => {
-   const conn = await createConnection({
+   await createConnection({
       type: 'postgres',
       database: 'lireddit2',
       username: 'gql-user',
@@ -67,7 +69,7 @@ const main = async() => {
          resolvers: [HelloResolver, PostResolver, UserResolver],
          validate: false,
       }),
-      context: async ({req, res}) => ({ req, res, redis }), 
+      context: async ({req, res}) => ({ req, res, redis, userLoader: createUserLoader() }), 
       plugins: [
          ApolloServerPluginLandingPageGraphQLPlayground()
       ]
