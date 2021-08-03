@@ -37,6 +37,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "graphql": "^15.5.1",
+    "https": "^1.0.0",
     "ioredis": "^4.27.6",
     "nodemailer": "^6.6.3",
     "pg": "^8.6.0",

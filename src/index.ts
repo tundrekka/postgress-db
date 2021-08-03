@@ -5,6 +5,7 @@ import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
 import path from 'path'
+// import 'dotenv'
 
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
@@ -18,7 +19,6 @@ import { Post } from './entities/Post'
 import { User } from './entities/User'
 import { Updoot } from './entities/Updoot'
 import { createUserLoader } from './utils/createUserLoader'
-
 const main = async() => {
    await createConnection({
       type: 'postgres',
@@ -37,7 +37,8 @@ const main = async() => {
    const redis = new Redis()
 
 
-   // cor
+   // cors
+   // TODO make origin a Env Variables
    app.use(cors({
       origin: 'http://localhost:3000',
       credentials: true
@@ -78,7 +79,8 @@ const main = async() => {
    await apolloServer.start()
 
    apolloServer.applyMiddleware({ app, cors: false })
-   
+
+   // TODO make port a Env Variables
    app.listen(4001, () => {
       console.log('server started at localhost: 4001')
    })
