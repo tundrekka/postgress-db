@@ -148,6 +148,51 @@ export class PostResolver {
       }
    }
 
+   // get one user posts
+   @Query(() => PaginatedPosts)
+   async userPosts(
+      @Arg('uid', () => Int) uid: number,
+      @Arg('limit', () => Int) limit: number,
+      @Arg('cursor', () => String, { nullable: true }) cursor: string | null,
+      @Ctx() { req }: MyContext
+   ): Promise<PaginatedPosts> {
+      const realLimit = Math.min(50, limit)
+      const realLimitPlusOne = realLimit + 1
+      const replacements: any[] = [realLimitPlusOne]
+      if (req.session.userId) {
+         replacements.push(req.session.userId)
+      }
+      let cursorIdx = 3
+      let uidIdx = cursorIdx
+      if (cursor) {
+         replacements.push(new Date(parseInt(cursor)))
+         cursorIdx = replacements.length
+         uidIdx = cursorIdx + 1
+      } else if(!req.session.userId) {
+         uidIdx = cursorIdx -1
+      }
+      replacements.push(uid)
+      const posts = await getConnection().query(
+         `select p.*,
+      ${
+         req.session.userId
+            ? '(select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"'
+            : 'null as "voteStatus"'
+      }
+      from post p
+      ${cursor ? `where p."createdAt" < $${cursorIdx} and p."creatorId" = $${uidIdx}` : `where p."creatorId" = $${uidIdx}`}
+      order by p."createdAt" DESC 
+      limit $1
+      `,
+         replacements
+      )
+
+      return {
+         posts: posts.slice(0, realLimit),
+         hasMore: posts.length === realLimitPlusOne,
+      }
+   }
+
    // get a single post
    @Query(() => Post, { nullable: true }) // graphql return type
    post(@Arg('id', () => Int) id: number): Promise<Post | undefined> {
@@ -160,7 +205,16 @@ export class PostResolver {
    async createPost(
       @Arg('input') input: PostInput,
       @Ctx() { req }: MyContext
-   ): Promise<Post> {
+   ): Promise<Post | undefined> {
+      if(input.title.length < 2) {
+         return
+      }
+      if (input.title.length > 70) {
+         return
+      }
+      if(input.text.length < 25) {
+         return
+      }
       return Post.create({
          ...input,
          creatorId: req.session.userId,

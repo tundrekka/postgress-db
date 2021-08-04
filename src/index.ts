@@ -20,7 +20,8 @@ import { User } from './entities/User'
 import { Updoot } from './entities/Updoot'
 import { createUserLoader } from './utils/createUserLoader'
 const main = async() => {
-   await createConnection({
+   
+   /* const conn = */ await createConnection({
       type: 'postgres',
       database: 'lireddit2',
       username: 'gql-user',
@@ -31,6 +32,7 @@ const main = async() => {
       migrations: [path.join(__dirname, './migrations/*')]
    })
    // await conn.runMigrations()
+
    
    const app = express()
    const RedisStore = connectRedis(session)
@@ -63,7 +65,7 @@ const main = async() => {
          resave: false
       })
    )
-
+   // ksjd
    // context, schema, plugins
    const apolloServer = new ApolloServer({
       schema: await buildSchema({
