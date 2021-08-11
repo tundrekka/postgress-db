@@ -184,7 +184,6 @@ let UserResolver = class UserResolver {
             }
             try {
                 const valid = yield argon2_1.default.verify(user.password, password);
-                console.log(valid);
                 if (!valid) {
                     return {
                         errors: [

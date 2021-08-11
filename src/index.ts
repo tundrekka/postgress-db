@@ -5,11 +5,10 @@ import session from 'express-session'
 import connectRedis from 'connect-redis'
 import cors from 'cors'
 import path from 'path'
-// import 'dotenv'
+import dotenv from 'dotenv'
 
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
-import { HelloResolver } from './resolvers/hello'
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
 import { PostResolver } from './resolvers/post'
 import { UserResolver } from './resolvers/user'
@@ -19,30 +18,29 @@ import { Post } from './entities/Post'
 import { User } from './entities/User'
 import { Updoot } from './entities/Updoot'
 import { createUserLoader } from './utils/createUserLoader'
+dotenv.config()
 const main = async() => {
    
-   /* const conn = */ await createConnection({
+   await createConnection({
       type: 'postgres',
-      database: 'lireddit2',
-      username: 'gql-user',
-      password: 'gql-user',
+      url: process.env.DB_URL,
       logging: true,
       synchronize: true,
       entities: [Post, User, Updoot],
       migrations: [path.join(__dirname, './migrations/*')]
    })
-   // await conn.runMigrations()
 
    
    const app = express()
    const RedisStore = connectRedis(session)
    const redis = new Redis()
 
+   // app.set("proxy", 1);
 
-   // cors
+   // CORS
    // TODO make origin a Env Variables
    app.use(cors({
-      origin: 'http://localhost:3000',
+      origin: process.env.CORS_ORIGIN,
       credentials: true
    }))
 
@@ -61,15 +59,15 @@ const main = async() => {
             secure: __prod__,
          },
          saveUninitialized: false,
-         secret: 'randomstringrandomstringsecretstring',
+         secret: process.env.SESSION_SECRET,
          resave: false
       })
    )
-   // ksjd
+
    // context, schema, plugins
    const apolloServer = new ApolloServer({
       schema: await buildSchema({
-         resolvers: [HelloResolver, PostResolver, UserResolver],
+         resolvers: [PostResolver, UserResolver],
          validate: false,
       }),
       context: async ({req, res}) => ({ req, res, redis, userLoader: createUserLoader() }), 
@@ -82,9 +80,8 @@ const main = async() => {
 
    apolloServer.applyMiddleware({ app, cors: false })
 
-   // TODO make port a Env Variables
-   app.listen(4001, () => {
-      console.log('server started at localhost: 4001')
+   app.listen(process.env.PORT, () => {
+      console.log(`server started at localhost: ${process.env.PORT}`)
    })
 }  
 

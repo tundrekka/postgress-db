@@ -166,6 +166,15 @@ let PostResolver = class PostResolver {
     }
     createPost(input, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (input.title.length < 2) {
+                return;
+            }
+            if (input.title.length > 70) {
+                return;
+            }
+            if (input.text.length < 25) {
+                return;
+            }
             return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
         });
     }

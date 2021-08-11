@@ -4,7 +4,6 @@
 /node_modules
 /.pnp
 .pnp.js
-
 # testing
 /coverage
 
@@ -13,6 +12,8 @@
 /out/
 
 # production
+dist/
+/dist
 
 # misc
 .DS_Store

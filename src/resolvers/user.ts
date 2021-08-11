@@ -211,7 +211,6 @@ export class UserResolver {
 
       try {
          const valid = await argon2.verify(user.password, password)
-         console.log(valid)
          if (!valid) {
             return {
                errors: [
